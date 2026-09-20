@@ -1,0 +1,1855 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0,
+               maximum-scale=1.0, user-scalable=no">
+
+<title>NIMBUS — Classic Snake</title>
+
+<style>
+/* =========================================================
+   NIMBUS
+   CLASSIC NOKIA SNAKE
+   ========================================================= */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+}
+
+body {
+    min-height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background:
+        radial-gradient(
+            circle at center,
+            #252525 0%,
+            #111 55%,
+            #050505 100%
+        );
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    overflow-x: hidden;
+    color: #222;
+}
+
+/* =========================================================
+   PHONE
+   ========================================================= */
+
+.phone {
+    width: 390px;
+    max-width: calc(100vw - 24px);
+
+    padding: 25px 21px 28px;
+
+    border-radius: 38px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #a4a4a4,
+            #777
+        );
+
+    box-shadow:
+        inset 0 2px 3px rgba(255,255,255,.45),
+        inset 0 -5px 8px rgba(0,0,0,.25),
+        0 25px 70px rgba(0,0,0,.7);
+}
+
+/* =========================================================
+   BRAND
+   ========================================================= */
+
+.brand {
+    text-align: center;
+
+    font-family: Arial, sans-serif;
+    font-weight: 900;
+
+    font-size: 27px;
+    letter-spacing: 7px;
+
+    color: #202020;
+
+    margin-bottom: 20px;
+
+    text-shadow:
+        0 1px 0 rgba(255,255,255,.4);
+}
+
+.brand-small {
+    display: block;
+
+    margin-top: 5px;
+
+    font-size: 9px;
+    letter-spacing: 4px;
+
+    color: #454545;
+}
+
+/* =========================================================
+   SCREEN FRAME
+   ========================================================= */
+
+.screen-frame {
+    padding: 12px;
+
+    border-radius: 13px;
+
+    background: #333;
+
+    box-shadow:
+        inset 0 0 10px #111,
+        0 4px 5px rgba(0,0,0,.35);
+}
+
+/* =========================================================
+   GAME SCREEN
+   ========================================================= */
+
+.screen {
+    position: relative;
+
+    width: 100%;
+    aspect-ratio: 1 / 1;
+
+    overflow: hidden;
+
+    border: 5px solid #4e6200;
+
+    background: #9bbc0f;
+
+    box-shadow:
+        inset 0 0 25px rgba(25,45,0,.25);
+}
+
+canvas {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    image-rendering: pixelated;
+
+    touch-action: none;
+}
+
+/* =========================================================
+   SCREEN OVERLAYS
+   ========================================================= */
+
+.overlay {
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 20;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+
+    background:
+        rgba(155,188,15,.94);
+
+    color: #173600;
+
+    padding: 20px;
+}
+
+.overlay.hidden {
+    display: none;
+}
+
+.overlay h1 {
+    font-size: 31px;
+
+    letter-spacing: 4px;
+
+    margin-bottom: 15px;
+}
+
+.overlay p {
+    font-size: 12px;
+
+    line-height: 1.7;
+}
+
+.overlay .big-score {
+    font-size: 18px;
+
+    margin: 8px 0 17px;
+}
+
+/* =========================================================
+   SCORE
+   ========================================================= */
+
+.stats {
+    display: flex;
+
+    justify-content: space-between;
+
+    padding: 9px 3px 2px;
+
+    font-size: 13px;
+
+    font-weight: bold;
+
+    color: #111;
+}
+
+/* =========================================================
+   D-PAD
+   ========================================================= */
+
+.controls {
+    margin-top: 23px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 6px;
+}
+
+.control-row {
+    display: flex;
+
+    gap: 6px;
+}
+
+.dpad {
+    width: 65px;
+    height: 48px;
+
+    border: none;
+    border-radius: 8px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #626262,
+            #414141
+        );
+
+    color: #ddd;
+
+    font-size: 20px;
+
+    cursor: pointer;
+
+    box-shadow:
+        inset 0 -4px 0 #2d2d2d,
+        0 3px 4px rgba(0,0,0,.35);
+
+    touch-action: manipulation;
+}
+
+.dpad:active {
+    transform: translateY(3px);
+
+    box-shadow:
+        inset 0 -1px 0 #2d2d2d;
+}
+
+/* =========================================================
+   ACTION BUTTONS
+   ========================================================= */
+
+.actions {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-top: 18px;
+}
+
+.action {
+    width: 96px;
+    height: 39px;
+
+    border: none;
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #626262,
+            #404040
+        );
+
+    color: white;
+
+    font-family: "Courier New", monospace;
+
+    font-size: 10px;
+
+    font-weight: bold;
+
+    letter-spacing: 1px;
+
+    cursor: pointer;
+
+    box-shadow:
+        inset 0 -3px 0 #292929,
+        0 3px 4px rgba(0,0,0,.3);
+
+    touch-action: manipulation;
+}
+
+.action:active {
+    transform: translateY(2px);
+
+    box-shadow:
+        inset 0 -1px 0 #292929;
+}
+
+.pause-button {
+    width: 66px;
+    height: 35px;
+
+    border-radius: 18px;
+
+    background: #444;
+
+    color: #ddd;
+
+    font-family: "Courier New", monospace;
+
+    font-size: 9px;
+
+    font-weight: bold;
+
+    border: none;
+
+    cursor: pointer;
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.instructions {
+    text-align: center;
+
+    margin-top: 18px;
+
+    color: #343434;
+
+    font-size: 8px;
+
+    line-height: 1.7;
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 430px) {
+
+    .phone {
+        padding: 21px 16px 23px;
+
+        border-radius: 31px;
+    }
+
+    .brand {
+        font-size: 23px;
+
+        letter-spacing: 6px;
+    }
+
+    .dpad {
+        width: 60px;
+        height: 46px;
+    }
+
+    .action {
+        width: 90px;
+    }
+}
+
+@media (max-height: 700px) {
+
+    .phone {
+        transform: scale(.82);
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="phone">
+
+    <!-- BRAND -->
+
+    <div class="brand">
+        NIMBUS
+        <span class="brand-small">
+            CLASSIC SERIES
+        </span>
+    </div>
+
+
+    <!-- GAME SCREEN -->
+
+    <div class="screen-frame">
+
+        <div class="screen">
+
+            <canvas
+                id="gameCanvas"
+                width="400"
+                height="400">
+            </canvas>
+
+
+            <!-- START -->
+
+            <div
+                id="startOverlay"
+                class="overlay">
+
+                <h1>NIMBUS</h1>
+
+                <p>
+                    CLASSIC SNAKE
+                </p>
+
+                <br>
+
+                <p>
+                    PRESS START<br>
+                    OR ENTER
+                </p>
+
+            </div>
+
+
+            <!-- PAUSE -->
+
+            <div
+                id="pauseOverlay"
+                class="overlay hidden">
+
+                <h1>PAUSED</h1>
+
+                <p>
+                    PRESS PAUSE<br>
+                    OR SPACE
+                </p>
+
+            </div>
+
+
+            <!-- GAME OVER -->
+
+            <div
+                id="gameOverOverlay"
+                class="overlay hidden">
+
+                <h1>GAME OVER</h1>
+
+                <div
+                    id="finalScore"
+                    class="big-score">
+                    SCORE: 0
+                </div>
+
+                <p>
+                    PRESS START<br>
+                    TO PLAY AGAIN
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- SCORE -->
+
+        <div class="stats">
+
+            <span>
+                SCORE:
+                <span id="score">0</span>
+            </span>
+
+            <span>
+                HI:
+                <span id="highScore">0</span>
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- D-PAD -->
+
+    <div class="controls">
+
+        <div class="control-row">
+
+            <button
+                class="dpad"
+                id="upButton"
+                aria-label="Move up">
+                ▲
+            </button>
+
+        </div>
+
+
+        <div class="control-row">
+
+            <button
+                class="dpad"
+                id="leftButton"
+                aria-label="Move left">
+                ◀
+            </button>
+
+            <button
+                class="dpad"
+                id="downButton"
+                aria-label="Move down">
+                ▼
+            </button>
+
+            <button
+                class="dpad"
+                id="rightButton"
+                aria-label="Move right">
+                ▶
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- ACTION BUTTONS -->
+
+    <div class="actions">
+
+        <button
+            class="action"
+            id="startButton">
+            START
+        </button>
+
+        <button
+            class="pause-button"
+            id="pauseButton">
+            PAUSE
+        </button>
+
+        <button
+            class="action"
+            id="restartButton">
+            RESTART
+        </button>
+
+    </div>
+
+
+    <div class="instructions">
+
+        ARROWS / WASD — MOVE<br>
+        SPACE — PAUSE &nbsp; | &nbsp; ENTER — START
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   NIMBUS
+   GAME ENGINE
+   ========================================================= */
+
+
+/* ---------------------------------------------------------
+   CANVAS
+   --------------------------------------------------------- */
+
+const canvas =
+    document.getElementById("gameCanvas");
+
+const ctx =
+    canvas.getContext("2d");
+
+
+/* ---------------------------------------------------------
+   GAME SETTINGS
+   --------------------------------------------------------- */
+
+const GRID_SIZE = 20;
+
+const CANVAS_SIZE = 400;
+
+const CELL_SIZE =
+    CANVAS_SIZE / GRID_SIZE;
+
+
+/* ---------------------------------------------------------
+   COLORS
+   --------------------------------------------------------- */
+
+const LCD_BACKGROUND = "#9bbc0f";
+
+const LCD_GRID = "rgba(50,70,0,0.09)";
+
+const SNAKE_HEAD = "#173600";
+
+const SNAKE_BODY = "#315400";
+
+const FOOD_COLOR = "#173600";
+
+
+/* ---------------------------------------------------------
+   DOM
+   --------------------------------------------------------- */
+
+const scoreElement =
+    document.getElementById("score");
+
+const highScoreElement =
+    document.getElementById("highScore");
+
+const startOverlay =
+    document.getElementById("startOverlay");
+
+const pauseOverlay =
+    document.getElementById("pauseOverlay");
+
+const gameOverOverlay =
+    document.getElementById("gameOverOverlay");
+
+const finalScore =
+    document.getElementById("finalScore");
+
+
+/* ---------------------------------------------------------
+   GAME STATE
+   --------------------------------------------------------- */
+
+let snake = [];
+
+let food = {
+    x: 0,
+    y: 0
+};
+
+let direction = {
+    x: 1,
+    y: 0
+};
+
+let queuedDirection = {
+    x: 1,
+    y: 0
+};
+
+let score = 0;
+
+let highScore =
+    Number(
+        localStorage.getItem(
+            "nimbus-high-score"
+        )
+    ) || 0;
+
+let running = false;
+
+let paused = false;
+
+let lastUpdateTime = 0;
+
+let moveInterval = 140;
+
+let animationFrame = null;
+
+
+/* ---------------------------------------------------------
+   INITIAL SCORE
+   --------------------------------------------------------- */
+
+highScoreElement.textContent =
+    highScore;
+
+
+/* =========================================================
+   AUDIO
+   ========================================================= */
+
+let audioContext = null;
+
+
+function getAudioContext() {
+
+    if (!audioContext) {
+
+        const AudioContext =
+            window.AudioContext ||
+            window.webkitAudioContext;
+
+        if (AudioContext) {
+            audioContext =
+                new AudioContext();
+        }
+    }
+
+    return audioContext;
+}
+
+
+function sound(frequency, duration) {
+
+    const audio =
+        getAudioContext();
+
+    if (!audio) return;
+
+    const oscillator =
+        audio.createOscillator();
+
+    const gain =
+        audio.createGain();
+
+    oscillator.type = "square";
+
+    oscillator.frequency.value =
+        frequency;
+
+    gain.gain.setValueAtTime(
+        0.035,
+        audio.currentTime
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        0.001,
+        audio.currentTime + duration
+    );
+
+    oscillator.connect(gain);
+
+    gain.connect(audio.destination);
+
+    oscillator.start();
+
+    oscillator.stop(
+        audio.currentTime + duration
+    );
+}
+
+
+/* =========================================================
+   START / RESET
+   ========================================================= */
+
+function startGame() {
+
+    /* Cancel any previous animation */
+
+    if (animationFrame !== null) {
+
+        cancelAnimationFrame(
+            animationFrame
+        );
+
+        animationFrame = null;
+    }
+
+
+    /* Create initial snake */
+
+    snake = [
+
+        { x: 10, y: 10 },
+
+        { x: 9, y: 10 },
+
+        { x: 8, y: 10 },
+
+        { x: 7, y: 10 }
+
+    ];
+
+
+    /* Initial direction */
+
+    direction = {
+        x: 1,
+        y: 0
+    };
+
+    queuedDirection = {
+        x: 1,
+        y: 0
+    };
+
+
+    /* Reset score */
+
+    score = 0;
+
+    scoreElement.textContent = "0";
+
+
+    /* Reset speed */
+
+    moveInterval = 140;
+
+
+    /* Generate food */
+
+    food = generateFood();
+
+
+    /* Game state */
+
+    running = true;
+
+    paused = false;
+
+
+    /* Hide overlays */
+
+    startOverlay.classList.add("hidden");
+
+    pauseOverlay.classList.add("hidden");
+
+    gameOverOverlay.classList.add("hidden");
+
+
+    /* Reset timing */
+
+    lastUpdateTime =
+        performance.now();
+
+
+    /* Sound */
+
+    sound(650, 0.08);
+
+
+    /* Draw immediately */
+
+    draw();
+
+
+    /* Start engine */
+
+    animationFrame =
+        requestAnimationFrame(
+            gameLoop
+        );
+}
+
+
+/* =========================================================
+   GAME LOOP
+   ========================================================= */
+
+function gameLoop(timestamp) {
+
+    if (!running) {
+        return;
+    }
+
+
+    animationFrame =
+        requestAnimationFrame(
+            gameLoop
+        );
+
+
+    if (paused) {
+
+        lastUpdateTime =
+            timestamp;
+
+        return;
+    }
+
+
+    const elapsed =
+        timestamp - lastUpdateTime;
+
+
+    if (elapsed >= moveInterval) {
+
+        lastUpdateTime =
+            timestamp;
+
+        updateGame();
+    }
+
+
+    draw();
+}
+
+
+/* =========================================================
+   UPDATE GAME
+   ========================================================= */
+
+function updateGame() {
+
+    /*
+     Apply the queued direction only
+     at the beginning of a movement.
+    */
+
+    direction = {
+        x: queuedDirection.x,
+        y: queuedDirection.y
+    };
+
+
+    const head = {
+        x: snake[0].x + direction.x,
+        y: snake[0].y + direction.y
+    };
+
+
+    /* -----------------------------------------------------
+       WALL COLLISION
+       ----------------------------------------------------- */
+
+    if (
+        head.x < 0 ||
+        head.x >= GRID_SIZE ||
+        head.y < 0 ||
+        head.y >= GRID_SIZE
+    ) {
+
+        endGame();
+
+        return;
+    }
+
+
+    /* -----------------------------------------------------
+       SELF COLLISION
+       ----------------------------------------------------- */
+
+    /*
+     Normally the tail moves away during a
+     normal step, so collision checking against
+     the whole snake is correct for this game.
+    */
+
+    const hitSelf =
+        snake.some(
+            segment =>
+                segment.x === head.x &&
+                segment.y === head.y
+        );
+
+
+    if (hitSelf) {
+
+        endGame();
+
+        return;
+    }
+
+
+    /* -----------------------------------------------------
+       ADD NEW HEAD
+       ----------------------------------------------------- */
+
+    snake.unshift(head);
+
+
+    /* -----------------------------------------------------
+       FOOD
+       ----------------------------------------------------- */
+
+    const ateFood =
+        head.x === food.x &&
+        head.y === food.y;
+
+
+    if (ateFood) {
+
+        score++;
+
+        scoreElement.textContent =
+            score;
+
+
+        /* Update high score */
+
+        if (score > highScore) {
+
+            highScore = score;
+
+            highScoreElement.textContent =
+                highScore;
+
+            localStorage.setItem(
+                "nimbus-high-score",
+                String(highScore)
+            );
+        }
+
+
+        /* New food */
+
+        food = generateFood();
+
+
+        /* Speed increases gradually */
+
+        moveInterval =
+            Math.max(
+                55,
+                140 - score * 3
+            );
+
+
+        sound(550, 0.07);
+
+    } else {
+
+        /* Remove tail */
+
+        snake.pop();
+    }
+}
+
+
+/* =========================================================
+   GENERATE FOOD
+   ========================================================= */
+
+function generateFood() {
+
+    const availableCells = [];
+
+
+    /*
+     Build a list of all cells that
+     are NOT occupied by the snake.
+    */
+
+    for (
+        let y = 0;
+        y < GRID_SIZE;
+        y++
+    ) {
+
+        for (
+            let x = 0;
+            x < GRID_SIZE;
+            x++
+        ) {
+
+            const occupied =
+                snake.some(
+                    segment =>
+                        segment.x === x &&
+                        segment.y === y
+                );
+
+
+            if (!occupied) {
+
+                availableCells.push({
+                    x: x,
+                    y: y
+                });
+            }
+        }
+    }
+
+
+    /* If board is completely full */
+
+    if (availableCells.length === 0) {
+
+        return {
+            x: -1,
+            y: -1
+        };
+    }
+
+
+    const randomIndex =
+        Math.floor(
+            Math.random() *
+            availableCells.length
+        );
+
+
+    return availableCells[randomIndex];
+}
+
+
+/* =========================================================
+   DRAW
+   ========================================================= */
+
+function draw() {
+
+    /* Background */
+
+    ctx.fillStyle =
+        LCD_BACKGROUND;
+
+    ctx.fillRect(
+        0,
+        0,
+        CANVAS_SIZE,
+        CANVAS_SIZE
+    );
+
+
+    /* Grid */
+
+    drawGrid();
+
+
+    /* Food */
+
+    if (
+        food.x >= 0 &&
+        food.y >= 0
+    ) {
+
+        drawFood();
+    }
+
+
+    /* Snake */
+
+    drawSnake();
+}
+
+
+/* =========================================================
+   DRAW GRID
+   ========================================================= */
+
+function drawGrid() {
+
+    ctx.strokeStyle =
+        LCD_GRID;
+
+    ctx.lineWidth = 1;
+
+
+    for (
+        let i = 0;
+        i <= GRID_SIZE;
+        i++
+    ) {
+
+        const position =
+            i * CELL_SIZE;
+
+
+        /* Vertical */
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            position,
+            0
+        );
+
+        ctx.lineTo(
+            position,
+            CANVAS_SIZE
+        );
+
+        ctx.stroke();
+
+
+        /* Horizontal */
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            0,
+            position
+        );
+
+        ctx.lineTo(
+            CANVAS_SIZE,
+            position
+        );
+
+        ctx.stroke();
+    }
+}
+
+
+/* =========================================================
+   DRAW FOOD
+   ========================================================= */
+
+function drawFood() {
+
+    const x =
+        food.x * CELL_SIZE;
+
+    const y =
+        food.y * CELL_SIZE;
+
+
+    ctx.fillStyle =
+        FOOD_COLOR;
+
+
+    /*
+     Classic pixel-style food.
+    */
+
+    ctx.fillRect(
+        x + 5,
+        y + 5,
+        CELL_SIZE - 10,
+        CELL_SIZE - 10
+    );
+
+
+    ctx.fillStyle =
+        LCD_BACKGROUND;
+
+
+    ctx.fillRect(
+        x + 9,
+        y + 9,
+        3,
+        3
+    );
+}
+
+
+/* =========================================================
+   DRAW SNAKE
+   ========================================================= */
+
+function drawSnake() {
+
+    snake.forEach(
+        (segment, index) => {
+
+            const x =
+                segment.x * CELL_SIZE;
+
+            const y =
+                segment.y * CELL_SIZE;
+
+
+            if (index === 0) {
+
+                drawSnakeHead(
+                    x,
+                    y
+                );
+
+            } else {
+
+                drawSnakeBody(
+                    x,
+                    y
+                );
+            }
+        }
+    );
+}
+
+
+/* =========================================================
+   DRAW HEAD
+   ========================================================= */
+
+function drawSnakeHead(x, y) {
+
+    ctx.fillStyle =
+        SNAKE_HEAD;
+
+
+    ctx.fillRect(
+        x + 1,
+        y + 1,
+        CELL_SIZE - 2,
+        CELL_SIZE - 2
+    );
+
+
+    /* Eyes */
+
+    ctx.fillStyle =
+        LCD_BACKGROUND;
+
+
+    if (direction.x !== 0) {
+
+        const eyeX =
+            direction.x > 0
+                ? x + CELL_SIZE - 7
+                : x + 4;
+
+
+        ctx.fillRect(
+            eyeX,
+            y + 5,
+            3,
+            3
+        );
+
+        ctx.fillRect(
+            eyeX,
+            y + CELL_SIZE - 8,
+            3,
+            3
+        );
+
+    } else {
+
+        const eyeY =
+            direction.y > 0
+                ? y + CELL_SIZE - 7
+                : y + 4;
+
+
+        ctx.fillRect(
+            x + 5,
+            eyeY,
+            3,
+            3
+        );
+
+        ctx.fillRect(
+            x + CELL_SIZE - 8,
+            eyeY,
+            3,
+            3
+        );
+    }
+}
+
+
+/* =========================================================
+   DRAW BODY
+   ========================================================= */
+
+function drawSnakeBody(x, y) {
+
+    ctx.fillStyle =
+        SNAKE_BODY;
+
+
+    ctx.fillRect(
+        x + 2,
+        y + 2,
+        CELL_SIZE - 4,
+        CELL_SIZE - 4
+    );
+}
+
+
+/* =========================================================
+   END GAME
+   ========================================================= */
+
+function endGame() {
+
+    running = false;
+
+    paused = false;
+
+
+    if (animationFrame !== null) {
+
+        cancelAnimationFrame(
+            animationFrame
+        );
+
+        animationFrame = null;
+    }
+
+
+    finalScore.textContent =
+        "SCORE: " + score;
+
+
+    gameOverOverlay.classList.remove(
+        "hidden"
+    );
+
+
+    sound(130, 0.25);
+
+
+    draw();
+}
+
+
+/* =========================================================
+   PAUSE
+   ========================================================= */
+
+function togglePause() {
+
+    if (!running) {
+        return;
+    }
+
+
+    paused = !paused;
+
+
+    if (paused) {
+
+        pauseOverlay.classList.remove(
+            "hidden"
+        );
+
+    } else {
+
+        pauseOverlay.classList.add(
+            "hidden"
+        );
+
+
+        lastUpdateTime =
+            performance.now();
+    }
+}
+
+
+/* =========================================================
+   CHANGE DIRECTION
+   ========================================================= */
+
+function changeDirection(x, y) {
+
+    if (!running || paused) {
+        return;
+    }
+
+
+    /*
+     IMPORTANT:
+
+     Check against queuedDirection,
+     not the current direction.
+
+     This prevents a player from pressing
+     two directions quickly and accidentally
+     reversing into themselves.
+    */
+
+    if (
+        queuedDirection.x === -x &&
+        queuedDirection.y === -y
+    ) {
+        return;
+    }
+
+
+    /*
+     Ignore the same direction.
+    */
+
+    if (
+        queuedDirection.x === x &&
+        queuedDirection.y === y
+    ) {
+        return;
+    }
+
+
+    queuedDirection = {
+        x: x,
+        y: y
+    };
+}
+
+
+/* =========================================================
+   KEYBOARD
+   ========================================================= */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        const key =
+            event.key.toLowerCase();
+
+
+        switch (key) {
+
+            case "arrowup":
+            case "w":
+
+                event.preventDefault();
+
+                changeDirection(
+                    0,
+                    -1
+                );
+
+                break;
+
+
+            case "arrowdown":
+            case "s":
+
+                event.preventDefault();
+
+                changeDirection(
+                    0,
+                    1
+                );
+
+                break;
+
+
+            case "arrowleft":
+            case "a":
+
+                event.preventDefault();
+
+                changeDirection(
+                    -1,
+                    0
+                );
+
+                break;
+
+
+            case "arrowright":
+            case "d":
+
+                event.preventDefault();
+
+                changeDirection(
+                    1,
+                    0
+                );
+
+                break;
+
+
+            case " ":
+
+                event.preventDefault();
+
+                togglePause();
+
+                break;
+
+
+            case "enter":
+
+                event.preventDefault();
+
+                if (!running) {
+
+                    startGame();
+
+                }
+
+                break;
+        }
+    }
+);
+
+
+/* =========================================================
+   BUTTON HELPER
+   ========================================================= */
+
+function setupDirectionButton(
+    elementId,
+    x,
+    y
+) {
+
+    const button =
+        document.getElementById(
+            elementId
+        );
+
+
+    button.addEventListener(
+        "pointerdown",
+        event => {
+
+            event.preventDefault();
+
+            changeDirection(
+                x,
+                y
+            );
+        }
+    );
+}
+
+
+/* =========================================================
+   D-PAD
+   ========================================================= */
+
+setupDirectionButton(
+    "upButton",
+    0,
+    -1
+);
+
+setupDirectionButton(
+    "downButton",
+    0,
+    1
+);
+
+setupDirectionButton(
+    "leftButton",
+    -1,
+    0
+);
+
+setupDirectionButton(
+    "rightButton",
+    1,
+    0
+);
+
+
+/* =========================================================
+   ACTION BUTTONS
+   ========================================================= */
+
+document
+    .getElementById("startButton")
+    .addEventListener(
+        "click",
+        startGame
+    );
+
+
+document
+    .getElementById("restartButton")
+    .addEventListener(
+        "click",
+        startGame
+    );
+
+
+document
+    .getElementById("pauseButton")
+    .addEventListener(
+        "click",
+        togglePause
+    );
+
+
+/* =========================================================
+   TOUCH / SWIPE
+   ========================================================= */
+
+let touchStartX = 0;
+
+let touchStartY = 0;
+
+let touchActive = false;
+
+
+canvas.addEventListener(
+    "pointerdown",
+    event => {
+
+        /*
+         Ignore mouse pointers because
+         mouse movement is not a swipe.
+        */
+
+        if (
+            event.pointerType === "mouse"
+        ) {
+            return;
+        }
+
+
+        touchStartX =
+            event.clientX;
+
+        touchStartY =
+            event.clientY;
+
+        touchActive = true;
+    }
+);
+
+
+canvas.addEventListener(
+    "pointerup",
+    event => {
+
+        if (!touchActive) {
+            return;
+        }
+
+
+        touchActive = false;
+
+
+        const dx =
+            event.clientX -
+            touchStartX;
+
+        const dy =
+            event.clientY -
+            touchStartY;
+
+
+        const minimumSwipe =
+            25;
+
+
+        if (
+            Math.abs(dx) <
+                minimumSwipe &&
+            Math.abs(dy) <
+                minimumSwipe
+        ) {
+            return;
+        }
+
+
+        if (
+            Math.abs(dx) >
+            Math.abs(dy)
+        ) {
+
+            if (dx > 0) {
+
+                changeDirection(
+                    1,
+                    0
+                );
+
+            } else {
+
+                changeDirection(
+                    -1,
+                    0
+                );
+            }
+
+        } else {
+
+            if (dy > 0) {
+
+                changeDirection(
+                    0,
+                    1
+                );
+
+            } else {
+
+                changeDirection(
+                    0,
+                    -1
+                );
+            }
+        }
+    }
+);
+
+
+/* =========================================================
+   PREVENT PAGE SCROLLING ON GAME
+   ========================================================= */
+
+canvas.addEventListener(
+    "touchmove",
+    event => {
+        event.preventDefault();
+    },
+    {
+        passive: false
+    }
+);
+
+
+/* =========================================================
+   INITIAL SCREEN
+   ========================================================= */
+
+function initializeScreen() {
+
+    snake = [];
+
+    food = {
+        x: -1,
+        y: -1
+    };
+
+
+    ctx.fillStyle =
+        LCD_BACKGROUND;
+
+    ctx.fillRect(
+        0,
+        0,
+        CANVAS_SIZE,
+        CANVAS_SIZE
+    );
+
+
+    drawGrid();
+}
+
+
+initializeScreen();
+
+</script>
+
+</body>
+</html>
+```
