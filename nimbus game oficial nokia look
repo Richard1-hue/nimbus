@@ -436,13 +436,13 @@ canvas {
             </canvas>
 
 
-            <!-- START -->
+            <!-- START NOW -->
 
             <div
                 id="startOverlay"
                 class="overlay">
 
-                <h1>NIMBUS</h1>
+                <h1>NIMBUS GAME</h1>
 
                 <p>
                     CLASSIC SNAKE
@@ -452,7 +452,7 @@ canvas {
 
                 <p>
                     PRESS START<br>
-                    OR ENTER
+                    OR PRESS ENTER
                 </p>
 
             </div>
@@ -474,13 +474,13 @@ canvas {
             </div>
 
 
-            <!-- GAME OVER -->
+            <!-- #GAME OVER! -->
 
             <div
                 id="gameOverOverlay"
                 class="overlay hidden">
 
-                <h1>GAME OVER</h1>
+                <h1>#GAME OVER</h1>
 
                 <div
                     id="finalScore"
